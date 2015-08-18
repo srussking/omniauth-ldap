@@ -39,6 +39,11 @@ module OmniAuth
 
         return fail!(:missing_credentials) if missing_credentials?
         begin
+          if @adaptor.use_user_credential
+            @adaptor.bind_dn = request['username'] + '@' + @adaptor.base_to_host(@adaptor.base)
+            @adaptor.password = request['password']
+            @adaptor.reset_connection
+          end
           @ldap_user_info = @adaptor.bind_as(:filter => filter(@adaptor), :size => 1, :password => request['password'])
           return fail!(:invalid_credentials) if !@ldap_user_info
 
